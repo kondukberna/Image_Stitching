@@ -5,7 +5,7 @@ git clone https://github.com/kondukberna/Image_Stitching.git
 
 ## Build
 ```
-cd end2end && mkdir build && build
+mkdir build && build
 cmake ..
 make
 ```
