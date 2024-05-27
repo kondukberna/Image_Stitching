@@ -15,7 +15,7 @@ make
 Have to use firstly -resize flag with the resize rate. If you want to use an image with the original size, it can be set to 1.
 
 ```
-./imagestitcher -resize 0.5 -direction horizontal /images/DSC02930.JPG /images/DSC02930.JPG /images/DSC02931.JPG /images/DSC02932.JPG /images/DSC02933.JPG 
+./imagestitcher -resize 0.5 -direction horizontal -images_paths /images/DSC02930.JPG /images/DSC02930.JPG /images/DSC02931.JPG /images/DSC02932.JPG /images/DSC02933.JPG 
 ```
 
 ## Result
