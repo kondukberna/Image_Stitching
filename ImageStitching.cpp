@@ -4,7 +4,7 @@
 int main(int argc, char** argv)
 {
   if (argc < 4) {
-    cout << "Usage: " << argv[0] << " -resize <resize_factor> -direction <horizontal/vertical> <image_paths...>" << endl;
+    cout << "Usage: " << argv[0] << " -resize <resize_factor> -direction <horizontal/vertical> -image_paths <image_paths...>" << endl;
     return -1;
   }
 
@@ -18,7 +18,7 @@ int main(int argc, char** argv)
   {
     float resizeValue = atof(argv[2]);
 
-    for(int i=5;i<argc;i++)
+    for(int i=6;i<argc;i++)
     {
      char* image_path = argv[i];
      ImagesPath.push_back(image_path);
