@@ -4,23 +4,26 @@
 int main(int argc, char** argv)
 {
   if (argc < 4) {
-    cout << "Usage: " << argv[0] << " -resize <resize_factor> <image_paths...>" << endl;
+    cout << "Usage: " << argv[0] << " -resize <resize_factor> -direction <horizontal/vertical> <image_paths...>" << endl;
     return -1;
   }
 
   ImageStitcher Object;	
-  vector<string> ImagesPath;
+	vector<string> ImagesPath;
   vector<Mat> images;
   string resizeFlag = argv[1];
+  string direction = argv[4];
   
   if(resizeFlag == "-resize")
   {
     float resizeValue = atof(argv[2]);
-    for(int i=3;i<argc;i++)
+
+    for(int i=5;i<argc;i++)
     {
      char* image_path = argv[i];
      ImagesPath.push_back(image_path);
     }
+
     for(int j=0;j<ImagesPath.size();j++)
     {
       Mat inImg = imread(ImagesPath[j]);
@@ -44,7 +47,7 @@ int main(int argc, char** argv)
     cout << "You have to use -resize flag." << endl;
   }
 
-	Object.findGoodMatches(images);
+	Object.findGoodMatches(images, direction);
 
 }
 
