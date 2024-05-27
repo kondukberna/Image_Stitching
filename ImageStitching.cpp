@@ -4,7 +4,7 @@
 int main(int argc, char** argv)
 {
   if (argc < 4) {
-    cout << "Usage: " << argv[0] << " -resize <resize_factor> -direction <horizontal/vertical> -image_paths <image_paths...>" << endl;
+    cout << "Usage: " << argv[0] << " -resize <resize_factor> -direction <horizontal/vertical> -images_paths <image_paths...>" << endl;
     return -1;
   }
 
