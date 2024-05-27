@@ -16,8 +16,8 @@ public:
 	ImageStitcher();
 	~ImageStitcher();
 	void findKeypointsDescriptors(int i, vector<Mat>& images);
-	void findGoodMatches(vector<Mat>& images);
+	void findGoodMatches(vector<Mat>& images, string direction);
 	void findHomographyMatrix();
 	vector<int> getPoints(Mat img);
-	void createPanoramicImage(int j, vector<Mat>& images);
+	void createPanoramicImage(int j, vector<Mat>& images, string direction);
 };
