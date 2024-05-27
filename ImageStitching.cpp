@@ -9,13 +9,13 @@ int main(int argc, char** argv)
   }
 
   ImageStitcher Object;	
-	vector<string> ImagesPath;
+  vector<string> ImagesPath;
   vector<Mat> images;
   string resizeFlag = argv[1];
   
   if(resizeFlag == "-resize")
   {
-    float resizeValue = std::atof(argv[2]);
+    float resizeValue = atof(argv[2]);
     for(int i=3;i<argc;i++)
     {
      char* image_path = argv[i];
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
       }
 
 		  Mat outImg;
-		  cv::resize(inImg, outImg, cv::Size(inImg.cols * resizeValue, inImg.rows * resizeValue), 0, 0);
+		  resize(inImg, outImg, cv::Size(inImg.cols * resizeValue, inImg.rows * resizeValue), 0, 0);
 		  images.push_back(outImg);
     }
 
