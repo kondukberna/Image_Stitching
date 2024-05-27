@@ -20,6 +20,12 @@ Have to use firstly -resize flag with the resize rate. If you want to use an ima
 
 ## Result
 
-Images are from this [dataset](https://cs.adelaide.edu.au/~tjchin/apap/#Datasets). 
+Horizontal images are from this [dataset](https://cs.adelaide.edu.au/~tjchin/apap/#Datasets). Vertical images are from this [dataset](https://github.com/visionxiang/Image-Stitching-Dataset#SPHP). 
+
+# Horizontal Result
 
 ![](https://github.com/kondukberna/Image_Stitching/blob/main/images/StitchedImage.jpg)
+
+# Vertical Result
+
+![](https://github.com/kondukberna/Image_Stitching/blob/main/images/StitchedImage-Vertical.jpg)
