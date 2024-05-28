@@ -23,7 +23,7 @@ void ImageStitcher::findKeypointsDescriptors(int i, vector<Mat>& Images) {
 
 }
 
-void ImageStitcher::findGoodMatches(vector<Mat>& Images, string direction)
+void ImageStitcher::findGoodMatches(vector<Mat>& Images)
 {
 
 	for (int i = 0; i < Images.size() - 1; i++) {
@@ -58,7 +58,7 @@ void ImageStitcher::findGoodMatches(vector<Mat>& Images, string direction)
 		cv::imwrite("matchedImage.png", emptyMatchImgRefined);
 
 		findHomographyMatrix();
-		createPanoramicImage(i, Images, direction);
+		createPanoramicImage(i, Images);
 		GoodMatches.clear();
 		firstImageKP.clear();
 		secondImageKP.clear();
@@ -150,37 +150,20 @@ vector<int> ImageStitcher::getPoints(Mat img) {
 	return imgPoints;
 }
 
-void ImageStitcher::createPanoramicImage(int j, vector<Mat>& Images, string direction) {
+void ImageStitcher::createPanoramicImage(int j, vector<Mat>& Images) {
 
-		Mat result;
+      Mat result;
+      warpPerspective(Images[j + 1], result, HomographyMatrix, Size(Images[j].cols + Images[j + 1].cols, Images[j].rows + Images[j + 1].rows));
 
-    if (direction == "horizontal")
-	  {
-      warpPerspective(Images[j + 1], result, HomographyMatrix, Size(Images[j].cols + Images[j + 1].cols, Images[j].rows));
+      vector<int> points = getPoints(result);
 
-		  vector<int> points = getPoints(result);
+      Mat half(result, Rect(0, 0, Images[j].cols, Images[j].rows));
+      Images[j].copyTo(half);
 
-		  Mat half(result, Rect(0, 0, Images[j].cols, Images[j].rows));
-		  Images[j].copyTo(half);
+      Rect rect(0, 0, points[4], points[5]);
+      result = result(rect);
 
-		  Rect rect(0, points[0], points[4]-1, points[5] - points[0]);
-		  result = result(rect);
-    }
+      Images[j + 1] = result;
 
-		else if (direction == "vertical")
-	  {
-      warpPerspective(Images[j+1], result, HomographyMatrix, Size(Images[j].cols+Images[j+1].cols, Images[j].rows + Images[j + 1].rows));
-
-		  Mat half(result, Rect(0, 0, Images[j].cols, Images[j].rows));
-		  Images[j].copyTo(half);
-
-		  vector<int> points = getPoints(result);
-
-		  Rect rect(0, 0, points[1], points[2]);
-		  result = result(rect);
-    }
-    
-		Images[j + 1] = result;
-
-    imwrite("StitchedImage.jpg", result);
+      imwrite("StitchedImage.jpg", result);
 }
