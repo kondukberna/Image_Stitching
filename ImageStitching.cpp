@@ -1,39 +1,54 @@
-﻿// ImageStitching.cpp : Bu dosya 'main' işlevi içeriyor. Program yürütme orada başlayıp biter.
-//
-
 #include <iostream>
 #include "Stitcher.h"
 
 int main(int argc, char** argv)
 {
-	//if (argc == 3 && std::string(argv[1]) == "-first_image_path" && std::string(argv[3]) == "-second_image_path") {
-		//char* first_image_path = argv[2];
-		//char* second_image_path = argv[4];
-		ImageStitcher Object;
-		
-		vector<string> ImagesPath;
-		//ImagesPath.push_back(first_image_path);
-		//ImagesPath.push_back(second_image_path);
-		
-		ImagesPath.push_back("DSC02930.jpg");
-	    ImagesPath.push_back("DSC02931.jpg");
-		ImagesPath.push_back("DSC02932.jpg");
-		ImagesPath.push_back("DSC02933.jpg");
-		ImagesPath.push_back("DSC02934.jpg");
+  if (argc < 4) {
+    cout << "Usage: " << argv[0] << " -resize <resize_factor> -direction <horizontal/vertical> -images_paths <image_paths...>" << endl;
+    return -1;
+  }
 
-		vector<Mat> images;
-		string direction = "horizontal";
+  ImageStitcher Object;	
+	vector<string> ImagesPath;
+  vector<Mat> images;
+  string resizeFlag = argv[1];
+  string direction = argv[4];
+  
+  if(resizeFlag == "-resize")
+  {
+    float resizeValue = atof(argv[2]);
 
-		for (int i = 0; i < ImagesPath.size(); i++)
-		{
-			Mat inImg = imread(ImagesPath[i]);
-			Mat outImg;
-			cv::resize(inImg, outImg, cv::Size(inImg.cols * 0.25, inImg.rows * 0.25), 0, 0);
-			images.push_back(outImg);
-		}
+    for(int i=6;i<argc;i++)
+    {
+     char* image_path = argv[i];
+     ImagesPath.push_back(image_path);
+    }
 
-		Object.findGoodMatches(images, direction);
-	//}
+    for(int j=0;j<ImagesPath.size();j++)
+    {
+      Mat inImg = imread(ImagesPath[j]);
+
+      if (inImg.empty()) {
+        cout << "Error loading image: " << ImagesPath[j] << endl;
+        return -1;
+      }
+
+		  Mat outImg;
+		  resize(inImg, outImg, cv::Size(inImg.cols * resizeValue, inImg.rows * resizeValue), 0, 0);
+		  images.push_back(outImg);
+    }
+
+    if (images.size() < 2) {
+        cout << "Need at least two images for stitching." << endl;
+        return -1;
+    }
+  }
+  else{
+    cout << "You have to use -resize flag." << endl;
+  }
+
+	Object.findGoodMatches(images, direction);
+
 }
 
 
