@@ -4,7 +4,7 @@
 int main(int argc, char** argv)
 {
   if (argc < 4) {
-    cout << "Usage: " << argv[0] << " -resize <resize_factor> -direction <horizontal/vertical> -images_paths <image_paths...>" << endl;
+    cout << "Usage: " << argv[0] << " -resize <resize_factor> -images_paths <image_paths...>" << endl;
     return -1;
   }
 
@@ -12,13 +12,12 @@ int main(int argc, char** argv)
 	vector<string> ImagesPath;
   vector<Mat> images;
   string resizeFlag = argv[1];
-  string direction = argv[4];
   
   if(resizeFlag == "-resize")
   {
     float resizeValue = atof(argv[2]);
 
-    for(int i=6;i<argc;i++)
+    for(int i=3;i<argc;i++)
     {
      char* image_path = argv[i];
      ImagesPath.push_back(image_path);
@@ -47,7 +46,7 @@ int main(int argc, char** argv)
     cout << "You have to use -resize flag." << endl;
   }
 
-	Object.findGoodMatches(images, direction);
+	Object.findGoodMatches(images);
 
 }
 
