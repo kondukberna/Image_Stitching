@@ -92,7 +92,7 @@ void ImageStitcher::findHomographyMatrix() {
 	}
 }
 
-vector<int> ImageStitcher::getPoints(Mat img) {
+vector<int> ImageStitcher::getCornerPoints(Mat img) {
 
 	vector<int>imgPoints;
 	int min_y = img.rows;
@@ -251,12 +251,12 @@ void ImageStitcher::createPanoramicImage(int j, vector<Mat>& Images, string dire
 	Mat result;
 	warpPerspective(Images[j+1], result, HomographyMatrix, Size(Images[j].cols + Images[j + 1].cols, Images[j].rows + Images[j + 1].rows));
 
-	vector<int> rectPointsSecond = getPoints(result);
+	vector<int> rectPointsSecond = getCornerPoints(result);
 
 	Mat half(result, Rect(0, 0, Images[j].cols, Images[j].rows));
 	Images[j].copyTo(half);
 
-	vector<int> rectPoints = getPoints(result);
+	vector<int> rectPoints = getCornerPoints(result);
 
 	if (direction == "horizontal")
 	{
