@@ -1,4 +1,5 @@
 #include "Stitcher.h"
+#include "Stitcher.h"
 
 ImageStitcher::ImageStitcher() {
 	cout << "Image Stitcher Constructed." << endl;
@@ -73,22 +74,22 @@ void ImageStitcher::findGoodMatches(vector<Mat>& Images, string direction)
 
 void ImageStitcher::findHomographyMatrix() {
 
-		vector<Point2f> emptyPointsFirst;
-		vector<Point2f> emptyPointsSecond;
+	vector<Point2f> emptyPointsFirst;
+	vector<Point2f> emptyPointsSecond;
 
-		for (int i = 0; i < GoodMatches.size(); i++)
-		{
-			cv::DMatch Match = GoodMatches[i];
-			emptyPointsFirst.push_back(firstImageKP[Match.queryIdx].pt);
-			emptyPointsSecond.push_back(secondImageKP[Match.trainIdx].pt);
-		}
-    if (emptyPointsFirst.size() >= 4 && emptyPointsSecond.size() >= 4) {
-      HomographyMatrix = findHomography(emptyPointsSecond, emptyPointsFirst, cv::RANSAC, (4.0));
-    }
-    else
-    {
-      cout << "Not enough points to compute homography. Image size can be increased." << endl;
-    }
+	for (int i = 0; i < GoodMatches.size(); i++)
+	{
+		cv::DMatch Match = GoodMatches[i];
+		emptyPointsFirst.push_back(firstImageKP[Match.queryIdx].pt);
+		emptyPointsSecond.push_back(secondImageKP[Match.trainIdx].pt);
+	}
+	if (emptyPointsFirst.size() >= 4 && emptyPointsSecond.size() >= 4) {
+		HomographyMatrix = findHomography(emptyPointsSecond, emptyPointsFirst, cv::RANSAC, (4.0));
+	}
+	else
+	{
+		cout << "Not enough points to compute homography. Image size can be increased." << endl;
+	}
 }
 
 vector<int> ImageStitcher::getPoints(Mat img) {
@@ -113,7 +114,7 @@ vector<int> ImageStitcher::getPoints(Mat img) {
 			int green = pixel[1];
 			int red = pixel[2];
 
-			if (red != 0 && green != 0 && blue != 0)
+			if (red != 0 || green != 0 || blue != 0)
 			{
 				if (i <= min_x && j >= max_y)
 				{
@@ -150,37 +151,126 @@ vector<int> ImageStitcher::getPoints(Mat img) {
 	return imgPoints;
 }
 
+Rect ImageStitcher::getCropPointsHorizontal(vector<int> pointsFirst, vector<int> pointsSecond) {
+
+	int result_x1, result_x2, result_y1, result_y2;
+
+	if (pointsFirst[6] > pointsFirst[3])
+	{
+		result_x1 = pointsFirst[6];
+	}
+	else
+	{
+		result_x1 = pointsFirst[3];
+	}
+
+	if (pointsFirst[7] > pointsSecond[0])
+	{
+		result_y1 = pointsFirst[7];
+	}
+	else
+	{
+		result_y1 = pointsSecond[0];
+	}
+
+	if (pointsSecond[1] < pointsSecond[4])
+	{
+		result_x2 = pointsSecond[1];
+	}
+	else
+	{
+		result_x2 = pointsSecond[4];
+	}
+
+	if (pointsFirst[2] < pointsSecond[5])
+	{
+		result_y2 = pointsFirst[2];
+	}
+	else
+	{
+		result_y2 = pointsSecond[5];
+	}
+
+	int width = result_x2 - result_x1;
+	int height = result_y2 - result_y1;
+
+	Rect rect(result_x1, result_y1, width, height);
+	return rect;
+}
+
+
+Rect ImageStitcher::getCropPointsVertical(vector<int> pointsFirst, vector<int> pointsSecond) {
+
+	int result_x1, result_x2, result_y1, result_y2;
+
+	if (pointsFirst[6] > pointsSecond[3])
+	{
+		result_x1 = pointsFirst[6];
+	}
+	else
+	{
+		result_x1 = pointsSecond[3];
+	}
+
+	if (pointsFirst[7] > pointsFirst[0])
+	{
+		result_y1 = pointsFirst[7];
+	}
+	else
+	{
+		result_y1 = pointsFirst[0];
+	}
+
+	if (pointsFirst[1] < pointsSecond[4])
+	{
+		result_x2 = pointsFirst[1];
+	}
+	else
+	{
+		result_x2 = pointsSecond[4];
+	}
+
+	if (pointsSecond[5] < pointsSecond[2])
+	{
+		result_y2 = pointsSecond[5];
+	}
+	else
+	{
+		result_y2 = pointsSecond[2];
+	}
+
+	int width = result_x2 - result_x1;
+	int height = result_y2 - result_y1;
+
+	Rect rect(result_x1, result_y1, width, height);
+	return rect;
+}
+
 void ImageStitcher::createPanoramicImage(int j, vector<Mat>& Images, string direction) {
 
-		Mat result;
+	Mat result;
+	warpPerspective(Images[j+1], result, HomographyMatrix, Size(Images[j].cols + Images[j + 1].cols, Images[j].rows + Images[j + 1].rows));
 
-    if (direction == "horizontal")
-	  {
-      warpPerspective(Images[j + 1], result, HomographyMatrix, Size(Images[j].cols + Images[j + 1].cols, Images[j].rows));
+	vector<int> rectPointsSecond = getPoints(result);
 
-		  vector<int> points = getPoints(result);
+	Mat half(result, Rect(0, 0, Images[j].cols, Images[j].rows));
+	Images[j].copyTo(half);
 
-		  Mat half(result, Rect(0, 0, Images[j].cols, Images[j].rows));
-		  Images[j].copyTo(half);
+	vector<int> rectPoints = getPoints(result);
 
-		  Rect rect(0, points[0], points[4]-1, points[5] - points[0]);
-		  result = result(rect);
-    }
+	if (direction == "horizontal")
+	{
+		Rect rect = getCropPointsHorizontal(rectPoints, rectPointsSecond);
+		result = result(rect);
+	}
+	else if (direction == "vertical")
+	{
+		
+		Rect rect = getCropPointsVertical(rectPoints, rectPointsSecond);
+		result = result(rect);
+	}
 
-		else if (direction == "vertical")
-	  {
-      warpPerspective(Images[j+1], result, HomographyMatrix, Size(Images[j].cols+Images[j+1].cols, Images[j].rows + Images[j + 1].rows));
+	Images[j + 1] = result;
 
-		  Mat half(result, Rect(0, 0, Images[j].cols, Images[j].rows));
-		  Images[j].copyTo(half);
-
-		  vector<int> points = getPoints(result);
-
-		  Rect rect(0, 0, points[1], points[2]);
-		  result = result(rect);
-    }
-    
-		Images[j + 1] = result;
-
-    imwrite("StitchedImage.jpg", result);
+	imwrite("StitchedImage.jpg", result);
 }
